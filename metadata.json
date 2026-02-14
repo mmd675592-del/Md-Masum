@@ -1,0 +1,8 @@
+{
+  "name": "Bijoy Social & Messenger",
+  "description": "A professional social networking platform featuring a green theme and a full-featured Facebook-style Messenger with voice, video, and stickers.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
