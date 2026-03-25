@@ -14,12 +14,52 @@ interface CommentPageProps {
 }
 
 const BENGALI_STICKERS = [
-  { id: 's1', text: 'দারুণ!', color: 'bg-green-500' },
-  { id: 's2', text: 'অসাধারণ', color: 'bg-blue-500' },
-  { id: 's3', text: 'শুভকামনা', color: 'bg-pink-500' },
-  { id: 's4', text: 'মন ছুঁয়ে গেল', color: 'bg-purple-500' },
-  { id: 's5', text: 'একমত 👍', color: 'bg-orange-500' },
-  { id: 's6', text: 'কি কিউট!', color: 'bg-rose-400' },
+  { id: 'img1', url: 'https://i.ibb.co.com/20DnP2nf/images-22.jpg', type: 'image' },
+  { id: 'img2', url: 'https://i.ibb.co.com/tMgN5Tp3/images-16.jpg', type: 'image' },
+  { id: 'img3', url: 'https://i.ibb.co.com/jkQLG4FP/images-19.jpg', type: 'image' },
+  { id: 'img4', url: 'https://i.ibb.co.com/Y4B1PFhY/images-20.jpg', type: 'image' },
+  { id: 'img5', url: 'https://i.ibb.co.com/R4T3SyFN/images-17.jpg', type: 'image' },
+  { id: 'img6', url: 'https://i.ibb.co.com/XZ2MzHvb/images-18.jpg', type: 'image' },
+  { id: 'img7', url: 'https://i.ibb.co.com/RGDY26q9/com-mobioapp-banglasticker-2500.png', type: 'image' },
+  { id: 'img8', url: 'https://i.ibb.co.com/Q3tp9Fb9/images-21.jpg', type: 'image' },
+  { id: 'img9', url: 'https://i.ibb.co.com/JNwTq24/Funny-bangla-sticker-1.jpg', type: 'image' },
+  { id: 'img10', url: 'https://i.ibb.co.com/kVMqbp4V/882a2a02-9e2f-40cd-ba00-f09ac526051d.jpg', type: 'image' },
+  { id: 'img11', url: 'https://i.ibb.co.com/3mX8W48v/Funny-bangla-quotes-2.jpg', type: 'image' },
+  { id: 'img12', url: 'https://i.ibb.co.com/23HSgJ0d/65d8190e-c7b4-45a1-8952-c951f035c101.jpg', type: 'image' },
+  { id: 'img13', url: 'https://i.ibb.co.com/bgdQ5SVk/image.jpg', type: 'image' },
+  { id: 'img14', url: 'https://i.ibb.co.com/xS9fcH5r/13b0b170-94a1-49ad-96d2-e24467af19a8.jpg', type: 'image' },
+  { id: 'img15', url: 'https://i.ibb.co.com/LL5yWGq/622e58a6-ba0c-4d7b-870a-a4e1d3d4d48c.jpg', type: 'image' },
+  { id: 'img16', url: 'https://i.ibb.co.com/kgPszG0M/a85c5a90-27b3-4058-8abc-f75c8b8dd6f9.jpg', type: 'image' },
+  { id: 'img17', url: 'https://i.ibb.co.com/4Rcpz7LR/image.jpg', type: 'image' },
+  { id: 'img18', url: 'https://i.ibb.co.com/RGbZZXyz/Friends-funny-quotes-6.jpg', type: 'image' },
+  { id: 'img19', url: 'https://i.ibb.co.com/dJtLQyp0/Friend-funny-quotes-2.jpg', type: 'image' },
+  { id: 'img20', url: 'https://i.ibb.co.com/6R6ff2PY/Funny-bangla-quotes-1.jpg', type: 'image' },
+  { id: 'img21', url: 'https://i.ibb.co.com/MrVqSdv/Friends-funny-quotes-5.jpg', type: 'image' },
+  { id: 'img22', url: 'https://i.ibb.co.com/84Sc6YTN/e5345abc-d30c-4161-bae6-6efd75fea1a1.jpg', type: 'image' },
+  { id: 'img23', url: 'https://i.ibb.co.com/wNtDmrSd/Friends-funny-quotes-4.jpg', type: 'image' },
+  { id: 'img24', url: 'https://i.ibb.co.com/r2qnrVbh/friends-funny-quotes-3.jpg', type: 'image' },
+  { id: 'img25', url: 'https://i.ibb.co.com/k2QZMpzW/Friend-funny-quotes-1.jpg', type: 'image' },
+  { id: 'img26', url: 'https://i.ibb.co.com/0pRd9GX4/ee802df9-85bc-4415-8bd2-7f942e3226da.jpg', type: 'image' },
+  { id: 'img27', url: 'https://i.ibb.co.com/kgXXctmQ/0e268bec-f166-4dea-9eb8-b5a2734325e0.jpg', type: 'image' },
+  { id: 'img28', url: 'https://i.ibb.co.com/BH5XRzR8/Friends-funny-quotes-2.jpg', type: 'image' },
+  { id: 'img29', url: 'https://i.ibb.co.com/99XNKB1y/13a5b7fd-3779-4136-8c2d-5b4c844757f8.jpg', type: 'image' },
+  { id: 'img30', url: 'https://i.ibb.co.com/JRzgKqhf/Friend-funny-quotes.jpg', type: 'image' },
+  { id: 'img31', url: 'https://i.ibb.co.com/Hp7K7Sh9/3167c0f2-ff0f-464c-b6c2-09d76634e26a.jpg', type: 'image' },
+  { id: 'img32', url: 'https://i.ibb.co.com/HfxDB7Hh/9e302f4f-34a1-451a-bf3e-d252284106ca.jpg', type: 'image' },
+  { id: 'img33', url: 'https://i.ibb.co.com/WvPgwS2Z/Funny-bangla-quotes.jpg', type: 'image' },
+  { id: 'img34', url: 'https://i.ibb.co.com/Zz4sqrhY/77e117a0-df2b-4786-a5d7-5b3d8c2e3a7c.jpg', type: 'image' },
+  { id: 'img35', url: 'https://i.ibb.co.com/01KLdFJ/friends-funny-quotes-1.jpg', type: 'image' },
+  { id: 'img36', url: 'https://i.ibb.co.com/ksVMzKWt/friends-funny-quotes.jpg', type: 'image' },
+  { id: 'img37', url: 'https://i.ibb.co.com/1fpr5hQ9/6b7f41e2-3655-4264-be31-8427d85219e1.jpg', type: 'image' },
+  { id: 'img38', url: 'https://i.ibb.co.com/wF4kTHXK/Funny-bangla-sticker.jpg', type: 'image' },
+  { id: 'img39', url: 'https://i.ibb.co.com/0VByrR0g/a5be1d62229085-Y3-Jvc-Cwx-Njgy-LDEz-MTYs-MCw0-MQ.png', type: 'image' },
+  { id: 'img40', url: 'https://i.ibb.co.com/sdfdSGtw/images-2.jpg', type: 'image' },
+  { id: 's1', text: 'দারুণ!', type: 'text', color: 'bg-green-500' },
+  { id: 's2', text: 'অসাধারণ', type: 'text', color: 'bg-blue-500' },
+  { id: 's3', text: 'শুভকামনা', type: 'text', color: 'bg-pink-500' },
+  { id: 's4', text: 'মন ছুঁয়ে গেল', type: 'text', color: 'bg-purple-500' },
+  { id: 's5', text: 'একমত 👍', type: 'text', color: 'bg-orange-500' },
+  { id: 's6', text: 'কি কিউট!', type: 'text', color: 'bg-rose-400' },
 ];
 
 const CommentPage: React.FC<CommentPageProps> = ({ 
@@ -118,7 +158,7 @@ const CommentPage: React.FC<CommentPageProps> = ({
             onClick={() => onNavigateToProfile?.(comment.userId)}
             className={`${isReply ? 'w-7 h-7' : 'w-10 h-10'} rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 cursor-pointer hover:opacity-90`}
           >
-            <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" />
+            <img src={comment.avatar} alt={comment.author} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div className="flex-1">
             <div className="flex items-start gap-1">
@@ -126,12 +166,16 @@ const CommentPage: React.FC<CommentPageProps> = ({
                 <p onClick={() => onNavigateToProfile?.(comment.userId)} className={`${isReply ? 'text-[11px]' : 'text-xs'} font-bold text-gray-900 mb-0.5 cursor-pointer hover:underline`}>{comment.author}</p>
                 {comment.text && <p className={`${isReply ? 'text-[13px]' : 'text-[14px]'} text-gray-800 leading-tight mb-1`}>{comment.text}</p>}
                 {comment.image && (
-                  <img src={comment.image} alt="Comment Attachment" className="rounded-lg max-h-48 w-auto mt-2 mb-1 border border-gray-100" />
+                  <img src={comment.image} alt="Comment Attachment" className="rounded-lg max-h-48 w-auto mt-2 mb-1 border border-gray-100" referrerPolicy="no-referrer" />
                 )}
                 {comment.sticker && (
-                  <div className="mt-2 py-2 px-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 flex items-center justify-center">
-                    <span className="text-green-700 font-extrabold text-sm drop-shadow-sm">{comment.sticker}</span>
-                  </div>
+                  comment.sticker.startsWith('http') ? (
+                    <img src={comment.sticker} alt="Sticker" className="w-24 h-24 object-contain mt-2 rounded-lg" referrerPolicy="no-referrer" />
+                  ) : (
+                    <div className="mt-2 py-2 px-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 flex items-center justify-center">
+                      <span className="text-green-700 font-extrabold text-sm drop-shadow-sm">{comment.sticker}</span>
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -298,7 +342,7 @@ const CommentPage: React.FC<CommentPageProps> = ({
 
         {selectedImage && (
           <div className="relative w-20 h-20 mb-2 rounded-lg overflow-hidden border-2 border-green-500 shadow-md">
-            <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+            <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             <button onClick={() => setSelectedImage(null)} className="absolute top-0 right-0 bg-black/50 text-white p-1 rounded-bl-lg">
               <i className="fa-solid fa-xmark text-xs"></i>
             </button>
@@ -310,10 +354,14 @@ const CommentPage: React.FC<CommentPageProps> = ({
             {BENGALI_STICKERS.map(sticker => (
               <button
                 key={sticker.id}
-                onClick={() => handleSendComment('', sticker.text)}
-                className="py-3 px-2 rounded-lg bg-white border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all flex items-center justify-center text-center shadow-sm"
+                onClick={() => handleSendComment('', sticker.type === 'image' ? sticker.url : sticker.text)}
+                className="py-3 px-2 rounded-lg bg-white border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all flex items-center justify-center text-center shadow-sm min-h-[80px]"
               >
-                <span className="font-bold text-gray-800 text-xs">{sticker.text}</span>
+                {sticker.type === 'image' ? (
+                  <img src={sticker.url} alt="sticker" className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
+                ) : (
+                  <span className="font-bold text-gray-800 text-xs">{sticker.text}</span>
+                )}
               </button>
             ))}
           </div>

@@ -8,12 +8,17 @@ interface SavedPostsPageProps {
   onBack: () => void;
   onToggleReaction: (postId: string, type: keyof ReactionCounts) => void;
   onAddComment: (postId: string, text: string, image?: string, sticker?: string, parentId?: string) => void;
+  onToggleCommentReaction: (postId: string, commentId: string, type: keyof ReactionCounts) => void;
+  onDeleteComment: (postId: string, commentId: string) => void;
+  onEditComment: (postId: string, commentId: string, newText: string) => void;
+  onSharePost?: (post: Post) => void;
+  onShareToMessenger?: (post: Post) => void;
   onNavigateToProfile: (userId: string) => void;
   onUnsavePost: (postId: string) => void;
 }
 
 const SavedPostsPage: React.FC<SavedPostsPageProps> = ({ 
-  posts, onBack, onToggleReaction, onAddComment, onNavigateToProfile, onUnsavePost 
+  posts, onBack, onToggleReaction, onAddComment, onToggleCommentReaction, onDeleteComment, onEditComment, onSharePost, onShareToMessenger, onNavigateToProfile, onUnsavePost 
 }) => {
   return (
     <div className="fixed inset-0 z-[250] bg-[#F0F2F5] dark:bg-[#18191a] flex flex-col animate-in slide-in-from-right duration-300">
@@ -38,6 +43,11 @@ const SavedPostsPage: React.FC<SavedPostsPageProps> = ({
               posts={posts}
               onToggleReaction={onToggleReaction}
               onAddComment={onAddComment}
+              onToggleCommentReaction={onToggleCommentReaction}
+              onDeleteComment={onDeleteComment}
+              onEditComment={onEditComment}
+              onSharePost={onSharePost}
+              onShareToMessenger={onShareToMessenger}
               onNavigateToProfile={onNavigateToProfile}
               onSavePost={onUnsavePost}
               savedPostIds={posts.map(p => p.id)}

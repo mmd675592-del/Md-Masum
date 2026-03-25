@@ -7,25 +7,28 @@ interface FloatingMenuProps {
   onOpenHome?: () => void;
   onOpenFriends?: () => void;
   onOpenSettings?: () => void;
+  onOpenReels?: () => void;
 }
 
 const FloatingMenu: React.FC<FloatingMenuProps> = ({ 
-  onOpenMessenger, onOpenRequests, onOpenHome, onOpenSettings 
+  onOpenMessenger, onOpenRequests, onOpenHome, onOpenSettings, onOpenReels 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   /**
-   * Circular Arc Layout for 4 items:
-   * 1. Messenger (Top)
-   * 2. Requests (Top-Left) - Updated to exact FB style silhouette
-   * 3. Settings (Left)
-   * 4. Home (Bottom-Left)
+   * Circular Arc Layout for 5 items (Radius 160px):
+   * 1. Messenger (Top: 90 deg)
+   * 2. Reels (112.5 deg)
+   * 3. Requests (135 deg)
+   * 4. Settings (157.5 deg)
+   * 5. Home (Left: 180 deg)
    */
   const menuItems = [
-    { id: 'messenger', icon: 'fa-brands fa-facebook-messenger', color: 'text-blue-600', x: -15, y: -115, label: 'Chat' },
-    { id: 'requests', icon: 'fa-solid fa-user-group', color: 'text-blue-500', x: -90, y: -80, label: 'Friends' },
-    { id: 'settings', icon: 'fa-solid fa-gear', color: 'text-gray-600', x: -115, y: -5, label: 'Settings' },
-    { id: 'home', icon: 'fa-solid fa-house', color: 'text-orange-500', x: -85, y: 75, label: 'Home' },
+    { id: 'messenger', icon: 'fa-brands fa-facebook-messenger', color: 'text-blue-600', x: 0, y: -160 },
+    { id: 'reels', icon: 'fa-solid fa-clapperboard', color: 'text-blue-600', x: -61, y: -148 },
+    { id: 'requests', icon: 'fa-solid fa-user-group', color: 'text-blue-500', x: -113, y: -113 },
+    { id: 'settings', icon: 'fa-solid fa-gear', color: 'text-gray-600', x: -148, y: -61 },
+    { id: 'home', icon: 'fa-solid fa-house', color: 'text-orange-500', x: -160, y: 0 },
   ];
 
   const handleItemClick = (id: string) => {
@@ -34,6 +37,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({
     if (id === 'requests' && onOpenRequests) onOpenRequests();
     if (id === 'settings' && onOpenSettings) onOpenSettings();
     if (id === 'home' && onOpenHome) onOpenHome();
+    if (id === 'reels' && onOpenReels) onOpenReels();
   };
 
   return (
@@ -67,11 +71,6 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({
             >
               <i className={`${item.icon} ${item.color} text-xl`}></i>
             </button>
-            {isOpen && (
-              <span className="text-[10px] font-bold uppercase text-gray-600 tracking-tighter bg-white/90 px-2 py-0.5 rounded-lg shadow-sm border border-gray-100 animate-in fade-in zoom-in-75 duration-300">
-                {item.label}
-              </span>
-            )}
           </div>
         </div>
       ))}

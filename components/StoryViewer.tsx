@@ -23,6 +23,8 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
   const [showMenu, setShowMenu] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [flyingReactions, setFlyingReactions] = useState<{id: number, emoji: string, left: number, delay: number}[]>([]);
+  const [isReacting, setIsReacting] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const STORY_DURATION = 5000;
 
@@ -32,11 +34,13 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
   useEffect(() => {
     setProgress(0);
     setIsVideoPlaying(false);
+    setFlyingReactions([]);
+    setIsReacting(false);
     
     // If it's a video, progress is handled by video duration or standard time
     // But usually video stories play until end.
     const interval = setInterval(() => {
-      if (showViewers || showMenu || replyText.length > 0) return; // Pause if modals are open or typing
+      if (showViewers || showMenu || replyText.length > 0 || flyingReactions.length > 0) return; // Pause if modals are open, typing, or animating
       
       setProgress((prev) => {
         if (prev >= 100) {
@@ -74,8 +78,23 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
   };
 
   const handleReaction = (type: keyof ReactionCounts) => {
+    if (isReacting) return;
+    setIsReacting(true);
     onToggleReaction(story.id, type);
-    handleNext();
+    
+    const emoji = REACTION_DATA[type].emoji;
+    const newReactions = Array.from({ length: 12 }).map((_, i) => ({
+      id: Date.now() + i,
+      emoji,
+      left: 10 + Math.random() * 80,
+      delay: Math.random() * 0.4
+    }));
+    
+    setFlyingReactions(newReactions);
+    
+    setTimeout(() => {
+      handleNext();
+    }, 1500);
   };
 
   const handleSendReply = () => {
@@ -106,7 +125,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
             onClick={() => onNavigateToProfile?.(story.userId)}
             className="w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
           >
-            <img src={story.userAvatar} alt={story.username} className="w-full h-full object-cover" />
+            <img src={story.userAvatar} alt={story.username} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
@@ -155,9 +174,36 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
             </p>
           </div>
         ) : (
-          <img src={story.image} className="w-full h-auto max-h-full object-contain" alt="Story" />
+          <img src={story.image} className="w-full h-auto max-h-full object-contain" alt="Story" referrerPolicy="no-referrer" />
         )}
       </div>
+
+      {/* Flying Reactions */}
+      {flyingReactions.map(reaction => (
+        <div 
+          key={reaction.id}
+          className="absolute bottom-24 text-5xl pointer-events-none z-50 animate-fly-up"
+          style={{ 
+            left: `${reaction.left}%`,
+            animationDelay: `${reaction.delay}s`
+          }}
+        >
+          {reaction.emoji}
+        </div>
+      ))}
+
+      <style>{`
+        @keyframes flyUp {
+          0% { transform: translateY(0) scale(0.5); opacity: 0; }
+          20% { transform: translateY(-50px) scale(1.2); opacity: 1; }
+          80% { transform: translateY(-200px) scale(1); opacity: 0.8; }
+          100% { transform: translateY(-300px) scale(0.8); opacity: 0; }
+        }
+        .animate-fly-up {
+          animation: flyUp 1.2s ease-out forwards;
+          opacity: 0;
+        }
+      `}</style>
 
       {/* Footer Area */}
       <div className="absolute bottom-10 left-0 right-0 px-6 z-30 flex flex-col gap-6">
@@ -190,7 +236,8 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
                 <button 
                   key={key} 
                   onClick={() => handleReaction(key as keyof ReactionCounts)}
-                  className="text-2xl hover:scale-125 transition-transform active:scale-90"
+                  disabled={isReacting}
+                  className={`text-2xl transition-transform ${isReacting ? 'opacity-50 cursor-not-allowed' : 'hover:scale-125 active:scale-90'}`}
                 >
                   {data.emoji}
                 </button>
@@ -213,7 +260,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({
               {story.viewers.length > 0 ? story.viewers.map((v, i) => (
                 <div key={i} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
                   <div className="flex items-center gap-3">
-                    <img src={v.avatar} className="w-12 h-12 rounded-lg object-cover border" />
+                    <img src={v.avatar} className="w-12 h-12 rounded-lg object-cover border" referrerPolicy="no-referrer" />
                     <div>
                       <p className="font-bold text-gray-800">{v.name}</p>
                       <p className="text-xs text-gray-500">Viewed just now</p>

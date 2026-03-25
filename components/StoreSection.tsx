@@ -7,7 +7,7 @@ const stores = [
   { id: '2', name: 'MD ROHIT', time: '2m', image: 'https://i.pravatar.cc/150?u=rohit' },
   { id: '3', name: 'Runa', time: '2m', image: 'https://i.pravatar.cc/150?u=runa' },
   { id: '4', name: 'Farso', time: '1h', image: 'https://i.pravatar.cc/150?u=farso' },
-  { id: '5', name: 'Bijoy', time: '5m', image: 'https://i.pravatar.cc/150?u=bijoy' },
+  { id: 'me', name: 'Bijoy', time: '5m', image: 'https://i.pravatar.cc/150?u=bijoy' },
 ];
 
 const StoreSection: React.FC = () => {
@@ -26,6 +26,7 @@ const StoreSection: React.FC = () => {
               } 
               alt={store.name} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              referrerPolicy="no-referrer"
             />
             
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70"></div>
@@ -36,7 +37,7 @@ const StoreSection: React.FC = () => {
                   <i className="fa-solid fa-plus text-lg"></i>
                 </div>
               ) : (
-                <img src={store.image} alt={store.name} className="w-full h-full object-cover" />
+                <img src={store.image} alt={store.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               )}
             </div>
             

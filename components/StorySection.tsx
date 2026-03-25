@@ -106,6 +106,7 @@ const StorySection: React.FC<StorySectionProps> = ({ stories, onAddStory, onView
               src={avatarUrl} 
               alt="My Profile" 
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              referrerPolicy="no-referrer"
             />
           </div>
           <div className="absolute bottom-0 left-0 right-0 h-1/4 bg-white dark:bg-[#242526] flex flex-col items-center justify-center">
@@ -130,12 +131,12 @@ const StorySection: React.FC<StorySectionProps> = ({ stories, onAddStory, onView
                 <p className={`${story.fontStyle} text-[10px] font-bold line-clamp-4`}>{story.text}</p>
               </div>
             ) : (
-              <img src={story.image} alt={story.username} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <img src={story.image} alt={story.username} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" referrerPolicy="no-referrer" />
             )}
             
             <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60"></div>
             <div className="absolute top-2 left-2 w-9 h-9 rounded-full border-4 border-green-600 overflow-hidden bg-white z-10 shadow-md">
-              <img src={story.userAvatar} alt={story.username} className="w-full h-full object-cover" />
+              <img src={story.userAvatar} alt={story.username} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             <div className="absolute bottom-2 left-2 right-2 z-10">
               <p className="text-white text-[11px] font-bold leading-tight drop-shadow-lg truncate">

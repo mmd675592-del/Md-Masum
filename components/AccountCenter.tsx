@@ -11,7 +11,7 @@ interface AccountCenterProps {
 const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
 
 const AccountCenter: React.FC<AccountCenterProps> = ({ userInfo, onBack, onUpdateUserInfo }) => {
-  const [activeScreen, setActiveScreen] = useState<'main' | 'personal_details' | 'name_change' | 'ownership'>('main');
+  const [activeScreen, setActiveScreen] = useState<'main' | 'personal_details' | 'name_change'>('main');
   const [newName, setNewName] = useState(userInfo.name);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -76,7 +76,7 @@ const AccountCenter: React.FC<AccountCenterProps> = ({ userInfo, onBack, onUpdat
                 className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
               >
                 <div className="w-12 h-12 rounded-xl overflow-hidden border dark:border-gray-700 shadow-sm">
-                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Avatar" />
+                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Avatar" referrerPolicy="no-referrer" />
                 </div>
                 <div className="flex-1">
                   <p className="font-bold text-gray-900 dark:text-gray-100">{userInfo.name}</p>
@@ -98,11 +98,6 @@ const AccountCenter: React.FC<AccountCenterProps> = ({ userInfo, onBack, onUpdat
                  <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
                    <i className="fa-solid fa-shield-halved w-6 text-gray-400 dark:text-gray-500 text-lg"></i>
                    <span className="flex-1 text-[15px] font-medium text-gray-800 dark:text-gray-200">Password and security</span>
-                   <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-sm"></i>
-                 </div>
-                 <div onClick={() => setActiveScreen('ownership')} className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors">
-                   <i className="fa-solid fa-id-card-clip w-6 text-gray-400 dark:text-gray-500 text-lg"></i>
-                   <span className="flex-1 text-[15px] font-medium text-gray-800 dark:text-gray-200">Account ownership and control</span>
                    <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-sm"></i>
                  </div>
                </div>
@@ -174,38 +169,6 @@ const AccountCenter: React.FC<AccountCenterProps> = ({ userInfo, onBack, onUpdat
             >
               Review Change
             </button>
-          </div>
-        </>
-      )}
-
-      {activeScreen === 'ownership' && (
-        <>
-          {renderHeader("Ownership and control", 'main')}
-          <div className="flex-1 p-4 space-y-4 dark:bg-[#18191a]">
-             <div className="p-4 bg-white dark:bg-[#242526] rounded-2xl border dark:border-gray-800 hover:bg-red-50 dark:hover:bg-red-900/10 cursor-pointer transition-colors group">
-               <div className="flex items-center justify-between mb-2">
-                 <h4 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-red-700 transition-colors">Deactivation or deletion</h4>
-                 <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600"></i>
-               </div>
-               <p className="text-sm text-gray-500 dark:text-gray-400">Temporarily deactivate or permanently delete your account.</p>
-               
-               <div className="mt-6 space-y-3">
-                 <button className="w-full py-3 border-2 border-gray-100 dark:border-gray-700 rounded-xl font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">Deactivate Account</button>
-                 <button 
-                   onClick={() => showToast("Deletion request sent. You have 120 days to cancel this request.", "success")}
-                   className="w-full py-3 border-2 border-red-100 border-red-900 rounded-xl font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10"
-                 >
-                   Delete Account Permanently
-                 </button>
-               </div>
-             </div>
-
-             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-2xl">
-               <p className="text-xs text-blue-800 dark:text-blue-300 font-medium">
-                 <i className="fa-solid fa-shield-halved mr-2"></i>
-                 Deleting your account is permanent. When you delete your Bijoy account, you won't be able to retrieve the content or information you've shared. We will keep your data for **120 days** before permanent removal.
-               </p>
-             </div>
           </div>
         </>
       )}

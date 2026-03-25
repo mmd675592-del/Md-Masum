@@ -15,6 +15,10 @@ const StatusUpdate: React.FC<StatusUpdateProps> = ({ onImageSelect, onOpenCreate
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       onImageSelect(e.target.files[0]);
+      // Clear the input so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -26,7 +30,7 @@ const StatusUpdate: React.FC<StatusUpdateProps> = ({ onImageSelect, onOpenCreate
         {/* User Avatar with verified/active status dot - respects activeStatus toggle */}
         <div className="relative flex-shrink-0 cursor-pointer group" onClick={onProfileClick}>
           <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm bg-gray-50 dark:bg-gray-800 group-hover:ring-2 ring-green-500 transition-all">
-            <img src={currentAvatar} alt="My Profile" className="w-full h-full object-cover" />
+            <img src={currentAvatar} alt="My Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           {activeStatus && (
             <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#242526] rounded-full"></div>
@@ -68,7 +72,7 @@ const StatusUpdate: React.FC<StatusUpdateProps> = ({ onImageSelect, onOpenCreate
         type="file" 
         ref={fileInputRef} 
         onChange={handleFileChange} 
-        accept="image/*" 
+        accept="image/*,video/*" 
         className="hidden"
       />
     </div>

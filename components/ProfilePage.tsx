@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Post, Story, ReactionCounts, UserInfo, FriendshipStatus } from '../types';
 import Feed from './Feed';
 
@@ -9,71 +9,51 @@ interface ProfilePageProps {
   stories: Story[];
   userInfo: UserInfo;
   isMe: boolean;
-  onUpdateProfilePic: (url: string, caption?: string) => void;
-  onUpdateCoverPic: (url: string, caption?: string) => void;
   onToggleReaction: (postId: string, type: keyof ReactionCounts) => void;
   onAddComment: (postId: string, text: string, image?: string, sticker?: string, parentId?: string) => void;
+  onToggleCommentReaction: (postId: string, commentId: string, type: keyof ReactionCounts) => void;
+  onDeleteComment: (postId: string, commentId: string) => void;
+  onEditComment: (postId: string, commentId: string, newText: string) => void;
   onDeletePost: (postId: string) => void;
+  onSharePost?: (post: Post) => void;
+  onShareToMessenger?: (post: Post) => void;
   onOpenCreatePost: (openFeeling?: boolean) => void;
   onOpenEditProfile: () => void;
   onOpenMessage?: (userId: string) => void;
   onNavigateToProfile?: (userId: string) => void;
-  onFriendshipAction?: (userId: string, action: 'send' | 'accept' | 'delete' | 'cancel') => void;
+  onFriendshipAction?: (userId: string, action: 'send' | 'accept' | 'delete' | 'cancel' | 'block') => void;
+  onSavePost?: (postId: string) => void;
+  savedPostIds?: string[];
   activeStatusEnabled?: boolean;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ 
   onBack, posts, stories, userInfo, isMe,
-  onUpdateProfilePic, onUpdateCoverPic,
-  onToggleReaction, onAddComment, onDeletePost,
+  onToggleReaction, onAddComment, onToggleCommentReaction, onDeleteComment, onEditComment, onDeletePost, onSharePost, onShareToMessenger,
   onOpenCreatePost, onOpenEditProfile,
   onOpenMessage, onNavigateToProfile, onFriendshipAction,
+  onSavePost, savedPostIds = [],
   activeStatusEnabled = true
 }) => {
-  const profileInputRef = useRef<HTMLInputElement>(null);
-  const coverInputRef = useRef<HTMLInputElement>(null);
-  
-  const [tempUpdate, setTempUpdate] = useState<{ url: string, type: 'profile' | 'cover' } | null>(null);
-  const [caption, setCaption] = useState('');
   const [showGallery, setShowGallery] = useState(false);
 
   const userPosts = useMemo(() => {
+    if (userInfo.isNews) {
+      return posts.filter(p => p.authorId === userInfo.id);
+    }
     return posts.filter(p => p.authorId === userInfo.id);
-  }, [posts, userInfo.id]);
+  }, [posts, userInfo.id, userInfo.isNews]);
 
   const allUserPhotos = useMemo(() => {
-    const photos: string[] = [];
+    const photos = new Set<string>();
+    if (userInfo.avatar) photos.add(userInfo.avatar);
+    if (userInfo.cover) photos.add(userInfo.cover);
     userPosts.forEach(post => {
-      if (post.image) photos.push(post.image);
-      if (post.sharedPost?.image) photos.push(post.sharedPost.image);
+      if (post.image) photos.add(post.image);
+      if (post.sharedPost?.image) photos.add(post.sharedPost.image);
     });
-    return photos;
-  }, [userPosts]);
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'cover') => {
-    if (!isMe) return;
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        setTempUpdate({ url: result, type });
-        setCaption(type === 'profile' ? `${userInfo.name} updated his profile picture.` : `${userInfo.name} updated his cover photo.`);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleFinalUpdate = () => {
-    if (!tempUpdate) return;
-    if (tempUpdate.type === 'profile') {
-      onUpdateProfilePic(tempUpdate.url, caption);
-    } else {
-      onUpdateCoverPic(tempUpdate.url, caption);
-    }
-    setTempUpdate(null);
-    setCaption('');
-  };
+    return Array.from(photos);
+  }, [userPosts, userInfo.avatar, userInfo.cover]);
 
   const renderFriendButtons = () => {
     if (isMe) {
@@ -91,7 +71,30 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       );
     }
 
+    if (userInfo.isNews) {
+      return (
+        <>
+          <button className="flex-1 max-w-[180px] bg-blue-600 py-3 rounded-xl font-bold text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <i className="fa-solid fa-rss text-xs"></i>
+            Follow
+          </button>
+          <button onClick={() => onOpenMessage?.(userInfo.id)} className="flex-1 max-w-[180px] bg-gray-100 dark:bg-gray-800 py-3 rounded-xl font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <i className="fa-brands fa-facebook-messenger text-xs"></i>
+            Message
+          </button>
+        </>
+      );
+    }
+
     const status = userInfo.friendshipStatus || 'none';
+
+    if (status === 'blocked') {
+      return (
+        <div className="flex-1 py-3 rounded-xl font-bold text-red-600 bg-red-50 dark:bg-red-900/10 text-center border border-red-100 dark:border-red-900/20">
+          User Blocked
+        </div>
+      );
+    }
 
     switch (status) {
       case 'friends':
@@ -174,8 +177,17 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
             <div className="grid grid-cols-3 gap-1">
               {allUserPhotos.map((photo, index) => (
                 <div key={index} className="aspect-square bg-gray-100 dark:bg-gray-800 overflow-hidden relative group cursor-pointer">
-                  <img src={photo} alt={`User photo ${index}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  {photo.startsWith('data:video/') ? (
+                    <video src={photo} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                  ) : (
+                    <img src={photo} alt={`User photo ${index}`} className="w-full h-full object-cover transition-transform group-hover:scale-105" referrerPolicy="no-referrer" />
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                  {photo.startsWith('data:video/') && (
+                    <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1">
+                      <i className="fa-solid fa-play text-white text-xs"></i>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -194,9 +206,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#18191a] animate-in slide-in-from-right duration-300 pb-20">
-      <input type="file" ref={profileInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageSelect(e, 'profile')} />
-      <input type="file" ref={coverInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageSelect(e, 'cover')} />
-
       <div className="sticky top-0 z-50 bg-white dark:bg-[#242526] border-b dark:border-gray-800 flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
@@ -213,65 +222,77 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
       <div className="max-w-xl mx-auto">
         <div className="relative h-60 w-full bg-gray-200 dark:bg-gray-800 overflow-hidden group">
-          <img src={userInfo.cover} className="w-full h-full object-cover transition-opacity duration-300" alt="Cover" />
-          {isMe && (
-            <button onClick={() => coverInputRef.current?.click()} className="absolute bottom-4 right-4 w-10 h-10 bg-white/95 dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-white active:scale-90 transition-all border border-gray-100 dark:border-gray-700 z-20">
-              <i className="fa-solid fa-plus text-lg"></i>
-            </button>
-          )}
+          <img src={userInfo.cover} className="w-full h-full object-cover transition-opacity duration-300" alt="Cover" referrerPolicy="no-referrer" />
         </div>
 
         <div className="relative -mt-20 flex flex-col items-center">
           <div className="relative group">
             <div className="w-40 h-40 rounded-[2.5rem] bg-white dark:bg-[#242526] p-1.5 shadow-xl border-4 border-white dark:border-[#242526]">
               <div className="w-full h-full rounded-[2rem] overflow-hidden border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 relative">
-                <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Profile" />
+                <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Profile" referrerPolicy="no-referrer" />
                 {isUserActive && (
                   <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-white dark:border-[#242526] rounded-full shadow-md"></div>
                 )}
               </div>
             </div>
-            {isMe && (
-              <button onClick={() => profileInputRef.current?.click()} className="absolute bottom-2 right-2 w-10 h-10 bg-gray-200 dark:bg-gray-800 border-4 border-white dark:border-[#242526] rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 active:scale-90 transition-all shadow-md z-20">
-                <i className="fa-solid fa-plus text-sm"></i>
-              </button>
-            )}
           </div>
           <h1 className="mt-4 text-3xl font-extrabold text-gray-900 dark:text-gray-100">{userInfo.name}</h1>
+          {userInfo.isNews && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">News Page</span>
+              <span className="text-xs text-gray-500 font-bold">• {userInfo.followers?.toLocaleString()} followers</span>
+            </div>
+          )}
           <p className="mt-1 text-gray-500 dark:text-gray-400 font-medium text-center px-10">{userInfo.bio}</p>
         </div>
 
         <div className="mt-6 px-4 flex gap-3 justify-center">
           {renderFriendButtons()}
-          <button className="w-12 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
-            <i className="fa-solid fa-ellipsis"></i>
-          </button>
         </div>
 
         <div className="mt-8 px-6 space-y-4">
-          {userInfo.university && (
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-              <i className="fa-solid fa-graduation-cap w-5"></i>
-              <span className="text-sm">Studied at <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.university}</span></span>
-            </div>
-          )}
-          {userInfo.district && (
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-              <i className="fa-solid fa-house w-5"></i>
-              <span className="text-sm">Lives in <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.district}</span></span>
-            </div>
-          )}
-          {userInfo.hometown && (
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-              <i className="fa-solid fa-location-dot w-5"></i>
-              <span className="text-sm">From <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.hometown}</span></span>
-            </div>
-          )}
-          {userInfo.relationship && (
-            <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-              <i className="fa-solid fa-heart w-5"></i>
-              <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{userInfo.relationship}</span>
-            </div>
+          {userInfo.isNews ? (
+            <>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                <i className="fa-solid fa-newspaper w-5"></i>
+                <span className="text-sm">Media/News Company</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                <i className="fa-solid fa-thumbs-up w-5"></i>
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{userInfo.followers?.toLocaleString()} people like this</span>
+              </div>
+              <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                <i className="fa-solid fa-rss w-5"></i>
+                <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{userInfo.followers?.toLocaleString()} people follow this</span>
+              </div>
+            </>
+          ) : (
+            <>
+              {userInfo.university && (
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                  <i className="fa-solid fa-graduation-cap w-5"></i>
+                  <span className="text-sm">Studied at <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.university}</span></span>
+                </div>
+              )}
+              {userInfo.district && (
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                  <i className="fa-solid fa-house w-5"></i>
+                  <span className="text-sm">Lives in <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.district}</span></span>
+                </div>
+              )}
+              {userInfo.hometown && (
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                  <i className="fa-solid fa-location-dot w-5"></i>
+                  <span className="text-sm">From <span className="font-bold text-gray-800 dark:text-gray-200">{userInfo.hometown}</span></span>
+                </div>
+              )}
+              {userInfo.relationship && (
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                  <i className="fa-solid fa-heart w-5"></i>
+                  <span className="text-sm font-bold text-gray-800 dark:text-gray-200">{userInfo.relationship}</span>
+                </div>
+              )}
+            </>
           )}
           <button className="w-full py-2.5 mt-2 bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 font-bold rounded-lg hover:bg-green-100 dark:hover:bg-green-900/20 transition-colors">
             See {isMe ? 'your' : userInfo.name + "'s"} About info
@@ -284,7 +305,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
           <div className="p-4 bg-white dark:bg-[#242526]">
             <div className="flex items-center gap-3">
                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 cursor-pointer" onClick={() => onOpenCreatePost(false)}>
-                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Me" />
+                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Me" referrerPolicy="no-referrer" />
                </div>
                <div onClick={() => onOpenCreatePost(false)} className="flex-1 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer rounded-full px-5 py-3 text-gray-500 dark:text-gray-400 font-medium text-sm border border-gray-100 dark:border-gray-700 transition-colors">
                   post on update
@@ -299,41 +320,18 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
             posts={userPosts} 
             onToggleReaction={onToggleReaction} 
             onAddComment={onAddComment} 
+            onToggleCommentReaction={onToggleCommentReaction}
+            onDeleteComment={onDeleteComment}
+            onEditComment={onEditComment}
+            onSharePost={onSharePost}
+            onShareToMessenger={onShareToMessenger}
             onDeletePost={onDeletePost}
             onNavigateToProfile={onNavigateToProfile}
+            onSavePost={onSavePost}
+            savedPostIds={savedPostIds}
           />
         </div>
       </div>
-
-      {isMe && tempUpdate && (
-        <div className="fixed inset-0 z-[200] bg-white dark:bg-[#18191a] flex flex-col animate-in slide-in-from-bottom duration-300">
-          <div className="p-4 border-b dark:border-gray-800 flex items-center bg-white dark:bg-[#242526] sticky top-0 z-10 shadow-sm">
-            <button onClick={() => setTempUpdate(null)} className="mr-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-700 dark:text-gray-300">
-              <i className="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex-1 text-center pr-10">Update {tempUpdate.type === 'profile' ? 'Profile Picture' : 'Cover Photo'}</h2>
-            <button onClick={handleFinalUpdate} className="absolute right-4 font-bold px-5 py-2 rounded-lg bg-green-600 text-white shadow-md hover:bg-green-700 transition-all active:scale-95">SAVE</button>
-          </div>
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-[#18191a] flex flex-col">
-            <div className="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden mb-6">
-              <div className="p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
-                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Me" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-gray-900 dark:text-gray-100">{userInfo.name}</p>
-                </div>
-              </div>
-              <div className="px-4 pb-4">
-                <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write a caption..." className="w-full border-none bg-transparent outline-none resize-none text-gray-800 dark:text-gray-200 text-lg placeholder:text-gray-400 min-h-[100px]" />
-              </div>
-              <div className="aspect-square w-full bg-gray-100 dark:bg-gray-800 border-t dark:border-gray-800">
-                <img src={tempUpdate.url} className={`w-full h-full ${tempUpdate.type === 'profile' ? 'object-cover' : 'object-contain'}`} alt="Preview" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

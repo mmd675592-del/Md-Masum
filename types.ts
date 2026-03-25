@@ -40,6 +40,10 @@ export interface Post {
   comments: Comment[];
   userReaction?: keyof ReactionCounts | null;
   sharedPost?: Post; 
+  sharesCount?: number;
+  link?: string;
+  isNews?: boolean;
+  createdAt: number;
 }
 
 export type PrivacyType = 'public' | 'friends' | 'special_friends' | 'only_me';
@@ -73,6 +77,9 @@ export interface Message {
   isMe: boolean;
   isUnsent?: boolean;
   reaction?: keyof ReactionCounts | null;
+  sharedPost?: Post;
+  isEdited?: boolean;
+  isForwarded?: boolean;
 }
 
 export interface ChatSettings {
@@ -84,7 +91,7 @@ export interface ChatSettings {
   noteCreatedAt?: number;
 }
 
-export type FriendshipStatus = 'none' | 'sent' | 'received' | 'friends';
+export type FriendshipStatus = 'none' | 'sent' | 'received' | 'friends' | 'blocked';
 
 export interface UserInfo {
   id: string;
@@ -100,9 +107,15 @@ export interface UserInfo {
   relationship: string;
   nameLastChanged: number;
   isActive?: boolean;
-  lastActive?: string;
+  lastActive?: number;
   friendshipStatus?: FriendshipStatus;
   mutualFriends?: number;
+  isNews?: boolean;
+  followers?: number;
+  note?: string;
+  noteCreatedAt?: number;
+  noteReactions?: { userId: string; reaction: keyof ReactionCounts }[];
+  isProfileLocked?: boolean;
 }
 
 export interface Store {

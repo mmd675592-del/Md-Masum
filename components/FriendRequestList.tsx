@@ -7,7 +7,7 @@ interface FriendRequestListProps {
   suggestions: UserInfo[];
   onBack: () => void;
   onNavigateToProfile: (userId: string) => void;
-  onFriendshipAction: (userId: string, action: 'send' | 'accept' | 'delete' | 'cancel') => void;
+  onFriendshipAction: (userId: string, action: 'send' | 'accept' | 'delete' | 'cancel' | 'block') => void;
 }
 
 const FriendRequestList: React.FC<FriendRequestListProps> = ({ 
@@ -40,7 +40,7 @@ const FriendRequestList: React.FC<FriendRequestListProps> = ({
                 onClick={() => onNavigateToProfile(req.id)}
                 className="w-20 h-20 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 cursor-pointer"
               >
-                <img src={req.avatar} alt={req.name} className="w-full h-full object-cover" />
+                <img src={req.avatar} alt={req.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
               
               <div className="flex-1">
@@ -91,7 +91,7 @@ const FriendRequestList: React.FC<FriendRequestListProps> = ({
                   onClick={() => onNavigateToProfile(user.id)}
                   className="w-20 h-20 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 cursor-pointer"
                 >
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </div>
                 
                 <div className="flex-1">
@@ -111,7 +111,12 @@ const FriendRequestList: React.FC<FriendRequestListProps> = ({
                       <i className={`fa-solid ${user.friendshipStatus === 'sent' ? 'fa-user-minus' : 'fa-user-plus'} text-xs`}></i>
                       {user.friendshipStatus === 'sent' ? 'Cancel Request' : 'Add Friend'}
                     </button>
-                    <button className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg text-sm">Remove</button>
+                    <button 
+                      onClick={() => onFriendshipAction(user.id, 'block')}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg text-sm hover:bg-gray-300 transition-colors active:scale-95"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
               </div>

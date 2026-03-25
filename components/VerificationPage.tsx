@@ -89,7 +89,7 @@ const VerificationPage: React.FC<VerificationPageProps> = ({ onBack, userInfo })
 
               <div className="flex flex-col items-center py-4">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center justify-center mb-2">
-                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Profile" />
+                  <img src={userInfo.avatar} className="w-full h-full object-cover" alt="Profile" referrerPolicy="no-referrer" />
                 </div>
                 <p className="text-[10px] text-gray-400 uppercase font-bold">Profile Photo Selected</p>
               </div>

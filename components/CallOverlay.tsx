@@ -176,7 +176,7 @@ const CallOverlay: React.FC<CallOverlayProps> = ({ friend, type, onEnd }) => {
       <div className="relative z-10 flex flex-col items-center">
         <div className="relative mb-8">
           <div className={`w-36 h-36 rounded-3xl overflow-hidden border-4 ${isConnected ? 'border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.3)]' : 'border-gray-700'} transition-all duration-700 scale-100 active:scale-95`}>
-            <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
+            <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           {isConnected && (
             <>

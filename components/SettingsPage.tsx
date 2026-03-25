@@ -3,11 +3,16 @@ import React, { useState } from 'react';
 import { UserInfo } from '../types';
 import AccountCenter from './AccountCenter';
 import NotificationList from './NotificationList';
+import BlockingPage from './BlockingPage';
+import ProfileLocking from './ProfileLocking';
+import ActivityLog from './ActivityLog';
+import PrivacyCheckup from './PrivacyCheckup';
+import PrivacyShortcuts from './PrivacyShortcuts';
+import GeneralSettings from './GeneralSettings';
 
 interface SettingsPageProps {
   onBack: () => void;
   userInfo: UserInfo;
-  onLogout?: () => void;
   onEditProfile?: () => void;
   onUpdateUserInfo?: (info: Partial<UserInfo>) => void;
   onNavigateToNotifications?: () => void;
@@ -17,16 +22,55 @@ interface SettingsPageProps {
   onOpenVerification?: () => void;
   activeStatusEnabled?: boolean;
   onToggleActiveStatus?: () => void;
+  allUsers: Record<string, UserInfo>;
+  onFriendshipAction: (userId: string, action: 'send' | 'accept' | 'delete' | 'cancel' | 'block' | 'unblock') => void;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ 
-  onBack, userInfo, onLogout, onEditProfile, onUpdateUserInfo, onNavigateToNotifications,
+  onBack, userInfo, onEditProfile, onUpdateUserInfo, onNavigateToNotifications,
   isDarkMode, onToggleDarkMode, onOpenSaved, onOpenVerification,
-  activeStatusEnabled, onToggleActiveStatus
+  activeStatusEnabled, onToggleActiveStatus,
+  allUsers, onFriendshipAction
 }) => {
   const [showAccountCenter, setShowAccountCenter] = useState(false);
   const [showNotifList, setShowNotifList] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const [showBlocking, setShowBlocking] = useState(false);
+  const [showProfileLocking, setShowProfileLocking] = useState(false);
+  const [showActivityLog, setShowActivityLog] = useState(false);
+  const [showPrivacyCheckup, setShowPrivacyCheckup] = useState(false);
+  const [showPrivacyShortcuts, setShowPrivacyShortcuts] = useState(false);
+  const [showGeneralSettings, setShowGeneralSettings] = useState(false);
+
+  if (showProfileLocking) {
+    return <ProfileLocking userInfo={userInfo} onUpdateUserInfo={onUpdateUserInfo!} onBack={() => setShowProfileLocking(false)} />;
+  }
+
+  if (showActivityLog) {
+    return <ActivityLog onBack={() => setShowActivityLog(false)} />;
+  }
+
+  if (showPrivacyCheckup) {
+    return <PrivacyCheckup onBack={() => setShowPrivacyCheckup(false)} />;
+  }
+
+  if (showPrivacyShortcuts) {
+    return <PrivacyShortcuts onBack={() => setShowPrivacyShortcuts(false)} />;
+  }
+
+  if (showGeneralSettings) {
+    return <GeneralSettings userInfo={userInfo} onBack={() => setShowGeneralSettings(false)} />;
+  }
+
+  if (showBlocking) {
+    return (
+      <BlockingPage 
+        onBack={() => setShowBlocking(false)} 
+        allUsers={allUsers} 
+        onFriendshipAction={onFriendshipAction}
+      />
+    );
+  }
 
   if (showAccountCenter) {
     return (
@@ -113,6 +157,61 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
         {/* Categories Section */}
         <div className="space-y-6 px-4">
           <section>
+            <h5 className="px-1 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Settings & Privacy</h5>
+            <div className="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 divide-y divide-gray-50 dark:divide-gray-800 overflow-hidden">
+              <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" onClick={() => setShowGeneralSettings(true)}>
+                <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                  <i className="fa-solid fa-gear text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Settings</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+
+              <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" onClick={() => setShowPrivacyCheckup(true)}>
+                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  <i className="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Privacy Checkup</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+              
+              <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" onClick={() => setShowPrivacyShortcuts(true)}>
+                <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 flex items-center justify-center">
+                  <i className="fa-solid fa-lock text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Privacy Shortcuts</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+
+              <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" onClick={() => setShowActivityLog(true)}>
+                <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                  <i className="fa-solid fa-list-ul text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Activity Log</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+
+              <div className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors" onClick={() => setShowProfileLocking(true)}>
+                <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <i className="fa-solid fa-user-lock text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Profile Locking</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+            </div>
+          </section>
+
+          <section>
             <h5 className="px-1 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">Preferences</h5>
             <div className="bg-white dark:bg-[#242526] rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 divide-y divide-gray-50 dark:divide-gray-800 overflow-hidden">
               <div 
@@ -137,6 +236,19 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 </div>
                 <div className="flex-1">
                   <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Saved</p>
+                </div>
+                <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
+              </div>
+
+              <div 
+                onClick={() => setShowBlocking(true)}
+                className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center">
+                  <i className="fa-solid fa-user-slash text-lg"></i>
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 dark:text-gray-100 text-sm">Blocking</p>
                 </div>
                 <i className="fa-solid fa-chevron-right text-gray-300 dark:text-gray-600 text-xs"></i>
               </div>
@@ -170,13 +282,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           </section>
 
           <div className="pt-4">
-            <button 
-              onClick={onLogout}
-              className="w-full py-4 bg-white dark:bg-[#242526] text-red-600 dark:text-red-400 font-bold rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:bg-red-50 dark:hover:bg-red-900/10 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <i className="fa-solid fa-right-from-bracket"></i>
-              Log Out
-            </button>
             <p className="mt-8 text-center text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-[0.3em]">
               Bijoy Social • Version 2.8.5
             </p>

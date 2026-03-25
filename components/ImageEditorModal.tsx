@@ -61,7 +61,7 @@ const ImageEditorModal: React.FC<ImageEditorModalProps> = ({ file, onClose, onPo
         <div className="p-6">
           <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden mb-6 border-2 border-dashed border-gray-300 flex items-center justify-center">
             {previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+              <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
             ) : (
               <p className="text-gray-400">Loading image...</p>
             )}

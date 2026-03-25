@@ -106,6 +106,9 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose, onPost, 
         setSelectedTheme(THEMES[0]);
       };
       reader.readAsDataURL(e.target.files[0]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -147,7 +150,7 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose, onPost, 
         {/* User Info & Privacy */}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-            <img src={currentAvatar} alt="Bijoy" className="w-full h-full object-cover" />
+            <img src={currentAvatar} alt="Bijoy" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-x-1">
@@ -195,7 +198,11 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose, onPost, 
           
           {selectedImage && (
             <div className="relative mt-2 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 max-h-[400px]">
-              <img src={selectedImage} alt="Preview" className="w-full h-full object-contain" />
+              {selectedImage.startsWith('data:video/') ? (
+                <video src={selectedImage} className="w-full h-full object-contain" controls />
+              ) : (
+                <img src={selectedImage} alt="Preview" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+              )}
               <button 
                 onClick={() => setSelectedImage(null)}
                 className="absolute top-2 right-2 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
@@ -261,7 +268,7 @@ const PostCreationModal: React.FC<PostCreationModalProps> = ({ onClose, onPost, 
             </div>
           </div>
 
-          <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+          <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*,video/*" className="hidden" />
 
           {/* Tag Friends List */}
           {showTagList && (

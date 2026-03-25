@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { UserInfo } from '../types';
+import { UserInfo, Post } from '../types';
 
 interface SearchOverlayProps {
   onClose: () => void;
   users: UserInfo[];
+  posts: Post[];
   onNavigateToProfile: (userId: string) => void;
+  onNavigateToPost: (postId: string) => void;
 }
 
-const SearchOverlay: React.FC<SearchOverlayProps> = ({ onClose, users, onNavigateToProfile }) => {
+const SearchOverlay: React.FC<SearchOverlayProps> = ({ onClose, users, posts, onNavigateToProfile, onNavigateToPost }) => {
   const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentSearches');
@@ -24,9 +26,22 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ onClose, users, onNavigat
     ? [] 
     : users.filter(u => u.name.toLowerCase().includes(query.toLowerCase()));
 
+  const filteredPosts = query.trim() === ''
+    ? []
+    : posts.filter(p => 
+        p.content.toLowerCase().includes(query.toLowerCase()) || 
+        p.author.toLowerCase().includes(query.toLowerCase())
+      );
+
   const handleSelectUser = (user: UserInfo) => {
     addToRecent(user.name);
     onNavigateToProfile(user.id);
+    onClose();
+  };
+
+  const handleSelectPost = (post: Post) => {
+    addToRecent(post.content.slice(0, 20) + '...');
+    onNavigateToPost(post.id);
     onClose();
   };
 
@@ -105,26 +120,66 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ onClose, users, onNavigat
           </div>
         ) : (
           <div className="divide-y dark:divide-gray-800">
-            {filteredUsers.length > 0 ? filteredUsers.map(user => (
-              <div 
-                key={user.id} 
-                onClick={() => handleSelectUser(user)}
-                className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
-              >
-                <div className="w-12 h-12 rounded-xl overflow-hidden border dark:border-gray-700 shadow-sm">
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-gray-900 dark:text-gray-100">{user.name}</h4>
-                  <p className="text-[11px] text-gray-500 uppercase font-bold tracking-widest">
-                    {user.friendshipStatus === 'friends' ? 'Friend' : user.district || 'Bijoy User'}
-                  </p>
-                </div>
-                <i className="fa-solid fa-magnifying-glass text-gray-300 text-xs"></i>
+            {filteredUsers.length > 0 && (
+              <div>
+                <h3 className="px-4 py-2 text-sm font-bold text-gray-500 bg-gray-50 dark:bg-gray-800/50">People</h3>
+                {filteredUsers.map(user => (
+                  <div 
+                    key={user.id} 
+                    onClick={() => handleSelectUser(user)}
+                    className="p-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-xl overflow-hidden border dark:border-gray-700 shadow-sm">
+                      <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100">{user.name}</h4>
+                      <p className="text-[11px] text-gray-500 uppercase font-bold tracking-widest">
+                        {user.friendshipStatus === 'friends' ? 'Friend' : user.district || 'Bijoy User'}
+                      </p>
+                    </div>
+                    <i className="fa-solid fa-magnifying-glass text-gray-300 text-xs"></i>
+                  </div>
+                ))}
               </div>
-            )) : (
+            )}
+
+            {filteredPosts.length > 0 && (
+              <div>
+                <h3 className="px-4 py-2 text-sm font-bold text-gray-500 bg-gray-50 dark:bg-gray-800/50">Posts</h3>
+                {filteredPosts.map(post => (
+                  <div 
+                    key={post.id} 
+                    onClick={() => handleSelectPost(post)}
+                    className="p-4 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-full overflow-hidden border dark:border-gray-700 shadow-sm flex-shrink-0">
+                      <img src={post.avatar} alt={post.author} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-900 dark:text-gray-100 text-sm">{post.author}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1">
+                        {post.content}
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-2">{post.timestamp}</p>
+                    </div>
+                    {post.image && (
+                      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                        {post.image.startsWith('data:video/') ? (
+                          <video src={post.image} className="w-full h-full object-cover" />
+                        ) : (
+                          <img src={post.image} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {filteredUsers.length === 0 && filteredPosts.length === 0 && (
               <div className="p-10 text-center">
-                <i className="fa-solid fa-user-slash text-4xl text-gray-200 mb-4"></i>
+                <i className="fa-solid fa-search text-4xl text-gray-200 mb-4"></i>
                 <p className="text-gray-500 font-medium">No results found for "{query}"</p>
               </div>
             )}

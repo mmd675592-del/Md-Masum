@@ -7,8 +7,8 @@ interface EditProfileModalProps {
   onUpdateInfo: (info: Partial<UserInfo>) => void;
   profilePic: string;
   coverPic: string;
-  onUpdateProfilePic: (url: string) => void;
-  onUpdateCoverPic: (url: string) => void;
+  onUpdateProfilePic: (url: string, caption?: string) => void;
+  onUpdateCoverPic: (url: string, caption?: string) => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ 
@@ -17,6 +17,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   // Use local state for form data to ensure inputs are fast and persistent until final save
   const [formData, setFormData] = useState<UserInfo>({ ...userInfo });
   const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [profileCaption, setProfileCaption] = useState('');
+  const [coverCaption, setCoverCaption] = useState('');
 
   const profileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +31,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const handleMainSave = () => {
     // Final save of all changes in formData
+    if (formData.avatar !== userInfo.avatar) {
+      onUpdateProfilePic(formData.avatar, profileCaption || `${userInfo.name} updated his profile picture.`);
+    }
+    if (formData.cover !== userInfo.cover) {
+      onUpdateCoverPic(formData.cover, coverCaption || `${userInfo.name} updated his cover photo.`);
+    }
     onUpdateInfo(formData);
     onClose();
   };
@@ -39,10 +47,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       reader.onload = (event) => {
         const result = event.target?.result as string;
         if (type === 'profile') {
-          onUpdateProfilePic(result);
           setFormData(prev => ({ ...prev, avatar: result }));
         } else {
-          onUpdateCoverPic(result);
           setFormData(prev => ({ ...prev, cover: result }));
         }
       };
@@ -75,9 +81,20 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               Edit
             </button>
           </div>
+          {formData.avatar !== userInfo.avatar && (
+            <div className="mb-4">
+              <textarea 
+                value={profileCaption} 
+                onChange={(e) => setProfileCaption(e.target.value)} 
+                placeholder="Say something about your new profile picture..." 
+                className="w-full p-3 bg-gray-50 dark:bg-gray-800 border dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none text-gray-900 dark:text-gray-100 text-sm"
+                rows={2}
+              />
+            </div>
+          )}
           <div className="flex justify-center">
             <div className="w-44 h-44 rounded-full overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm relative group">
-              <img src={formData.avatar} className="w-full h-full object-cover" alt="Profile" />
+              <img src={formData.avatar} className="w-full h-full object-cover" alt="Profile" referrerPolicy="no-referrer" />
               <div 
                 onClick={() => profileInputRef.current?.click()}
                 className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
@@ -102,8 +119,19 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               Edit
             </button>
           </div>
+          {formData.cover !== userInfo.cover && (
+            <div className="mb-4">
+              <textarea 
+                value={coverCaption} 
+                onChange={(e) => setCoverCaption(e.target.value)} 
+                placeholder="Say something about your new cover photo..." 
+                className="w-full p-3 bg-gray-50 dark:bg-gray-800 border dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none text-gray-900 dark:text-gray-100 text-sm"
+                rows={2}
+              />
+            </div>
+          )}
           <div className="w-full h-44 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 relative group">
-            <img src={formData.cover} className="w-full h-full object-cover" alt="Cover" />
+            <img src={formData.cover} className="w-full h-full object-cover" alt="Cover" referrerPolicy="no-referrer" />
             <div 
               onClick={() => coverInputRef.current?.click()}
               className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
